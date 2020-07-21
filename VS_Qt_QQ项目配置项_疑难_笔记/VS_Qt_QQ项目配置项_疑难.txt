@@ -1,0 +1,8 @@
+创建项目成功后,出现几百个问题报警是因为 项目(p)-属性-配置属性-常规-Windows SDK版本 不匹配.
+出现include <> 无法打开 是因为 项目(p)-属性-配置属性-调试-SQL调试 没打开.
+
+在出现无法使用QWidget需添:
+include <QApplication>  QApplication a(argc, argv); return a.exec();
+
+如果出现无法找寻头文件的就是没有添加Qui,QWidgets等所需组件,在项目(p)-属性-配置属性-Qt Project Settings的
+Qt Modules 进行添加所需

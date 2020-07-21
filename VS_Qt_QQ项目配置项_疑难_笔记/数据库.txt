@@ -1,0 +1,49 @@
+CREATE DATABASE qtqq;#创建数据库
+use qtqq;#选择数据库
+
+#创建账户表
+create  table  tab_accounts(employeeID int(11)  UNSIGNED NOT NULL COMMENT'员工ID',
+			account char(20) not null PRIMARY KEY COMMENT'账户,主键', 
+			code char(20) not null COMMENT'密码');	#创建账户表
+
+#创建部门表
+create  table  tab_department(departmentID int UNSIGNED  PRIMARY KEY AUTO_INCREMENT COMMENT'公司部门群号,主键,自增',
+				department_name char(20) not null comment'部门名称,不能为空', 
+	        			picture char(100) comment'部门头像路径',
+				sign char(100) comment'部门口号');	#创建部门表
+
+#创建员工表
+create  table tab_employees (departmentID int UNSIGNED  not null comment'员工所属部门,不能为空',
+		employeeID int  PRIMARY KEY AUTO_INCREMENT comment'员工号',
+		employee_name char(50) not null comment'员工名称,不为空',
+		employee_sign char(200) comment'签名',
+		status tinyint DEFAULT 1 comment'状态,默认为1有效,0为无效',
+		picture char(100) not null comment'头像路径,不为空',
+		online tinyint not null comment'在线状态,不为空,1离线,2在线');	#创建员工表
+
+//插入数据 部门表数据
+			  insert into tab_department values(2000,'公司群','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\A.jpg','悦分享越拥有');
+insert into tab_department(department_name ,picture ,sign ) values('人事部','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\B.jpg','公心,民心,爱心,事事在心');
+insert into tab_department(department_name ,picture ,sign ) values('研发部','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\C.jpg','世界只有两种语言:一种没人用,一种天天挨骂.');
+insert into tab_department(department_name ,picture ,sign ) values('市场部','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\D.jpg','今天工作不努力,明天努力找工作!');
+
+
+						insert into tab_employees values(2001,10001,'renyi','风一样的女子',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\E.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2001,'rener','奋斗中....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\F.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2001,'rensan','加油....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\G.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2002,'yanyi','调bug中....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\H.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2002,'yaner','改bug中....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\I.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2002,'yansan','写bug中....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\J.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2003,'shiyi','跑市场中....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\K.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2003,'shier','目标明确,坚定不移',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\L.jpg',1);
+insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2003,'shisan','周末看海去.',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\M.jpg',1);
+
+insert into tab_accounts values(10001,'renyi','renyi');
+insert into tab_accounts values(10002,'rener','rener');
+insert into tab_accounts values(10003,'rensan','rensan');
+insert into tab_accounts values(10004,'yanyi','yanyi');
+insert into tab_accounts values(10005,'yaner','yaner');
+insert into tab_accounts values(10006,'yansan','yansan');
+insert into tab_accounts values(10007,'shiyi','shiyi');
+insert into tab_accounts values(10008,'shier','shier');
+insert into tab_accounts values(10009,'shisan','shisan');

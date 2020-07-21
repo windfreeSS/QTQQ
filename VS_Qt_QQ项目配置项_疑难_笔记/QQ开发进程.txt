@@ -1,0 +1,80 @@
+CCMainWindow类:QQ入口主窗口
+
+TitleBar类:自定义标题栏 标题条 (作于项目窗体的标题栏)
+  样式表疑惑:
+
+ .ini皮肤配置文件在Debug文件目录下,没有它窗体皮肤就不能正确显示了.
+还有Resources资源文件.
+
+BasicWindow类:基类窗口 (作于其它窗口基类)
+
+NotifyManager类:通知管理 
+
+CommonUtils类:改变默认的部件风格
+
+UserLogin类:登陆窗口
+对象名需跟样式表同步
+
+登陆进了显示CCMainWindow类 窗口: 
+
+skinWindow类:改变皮肤类(通过点击窗体里的Label标签来改变CCMainWindow的皮肤)
+
+QtClickLabel类:由于QLabel没有点击信号,所以继承QLabel,新增信号,重写鼠标按下事件,使它拥有点击发射信号
+
+在CCMainWindow类实现模拟升级QQ等级
+
+实现了CCMainWindow类ui的最小化和关闭,可最小化后程序找不到.还有皮肤最小化没有达到预想缩小
+
+皮肤最小化是因为信号与槽连接处没带参数,所以才是那样.
+
+实现搜索好友框的界面互动实现:eventFilter(QObject* obj, QEvent* event);//事件过滤 , updateSeachStyle();//更新搜索样式
+
+bug:皮肤窗口会在用户操作,在没有关闭的情况下一直新增
+
+CCMainWindow::initContactTree();实现联系人树视图;
+
+RootContactItem : public QLabel ;主要功能是树根项的动作标志动画
+
+ContactItem : public QWidget;//联系人项目,ui->头像,用户名,个签.直接添加到树项目中去
+
+TalkWindowShell : public QWidget;聊天窗口主体
+
+class EmotionWindow : public QWidget;//表情窗口
+
+class EmotionLabelItem : public QtClickLabel;//表情标签项目
+
+class TalkWindowItem : public QWidget;//联系窗口项目
+
+class WindowManager : public QObject;//窗体管理
+
+class TalkWindow : public QWidget;//联系窗口
+
+CCMainWindow::onItemDoubleClicked中体现了TalkWindowShell,TalkWindowItem ,TalkWindow 
+,WindowManager 等类与类,项与项之间复杂逻辑,联系等.(!!!)
+
+在联系他人弹出聊天窗口中然后删除掉所有联系窗口,再双击联系人展现聊天窗口时出现资源没有回收导致
+聊天窗口地址指向别处,系统进而崩溃,在下方解决:
+TalkWindow::~TalkWindow()
+{//关闭联系窗口进而将窗体管理的map所对应的项删除,以免二次添加导致生成窗口指向以销毁的内存空间
+	WindowManager::getInstance()->deleteWindowName(m_talkId);}
+
+class QMsgTextEdit : public QTextEdit;//信息文本编辑框 //作用发送信息部件的升华
+
+去到界面选择TalkWindow::ui.textEdit右键点击 _提升为.. _然后将QMsgTextEdit填进提升的类名称_添加_提升 .
+部件提升后如果编译报错无法找到所提升类的头文件,就需到项目-属性-vc++目录-包含目录
+中编辑设置为:    $(SolutionDir);$(IncludePath)     
+
+class MsgWebView : public QWebEngineView;//信息网页视图
+
+//信息网页对象
+class MsgHtmlObj :public QObject ;//用于发送信息的对象,和网页交互的必须成员
+
+//信息网页记录
+class MsgWebPage :public QWebEnginePage 
+
+TalkWindow::ui.msgWidget提升为MsgWebView;
+
+//创建数据库:
+
+在UserLogin新增连接数据库和账号密码验证
+
