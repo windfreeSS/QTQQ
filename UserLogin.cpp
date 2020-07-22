@@ -4,70 +4,70 @@ UserLogin::UserLogin(QWidget *parent)
 	: BasicWindow(parent)
 {
 	ui.setupUi(this);
-	setAttribute(Qt::WA_DeleteOnClose);//ÉèÖÃÊôĞÔ 
-	initTitleBar();//³õÊ¼»¯±êÌâ
-	setTitleBar(" ",":/Resources/MainWindow/qqlogoclassic.png");//ÉèÖÃ±êÌâÀ¸(±êÌâÎÄ±¾,Í¼±ê)
-	loadStyleSheet("UserLogin");//¼ÓÔØÑùÊ½±í
-	initControl();//³õÊ¼»¯¿Ø¼ş
+	setAttribute(Qt::WA_DeleteOnClose);//è®¾ç½®å±æ€§ 
+	initTitleBar();//åˆå§‹åŒ–æ ‡é¢˜
+	setTitleBar(" ",":/Resources/MainWindow/qqlogoclassic.png");//è®¾ç½®æ ‡é¢˜æ (æ ‡é¢˜æ–‡æœ¬,å›¾æ ‡)
+	loadStyleSheet("UserLogin");//åŠ è½½æ ·å¼è¡¨
+	initControl();//åˆå§‹åŒ–æ§ä»¶
 }
 
 UserLogin::~UserLogin()
 {
 }
 
-//³õÊ¼»¯¿Ø¼ş
+//åˆå§‹åŒ–æ§ä»¶
 void UserLogin::initControl()
 {
 	QLabel* headlabel = new QLabel(this);
-	headlabel->setFixedSize(68, 68);//ÉèÖÃ¹Ì¶¨´óĞ¡
+	headlabel->setFixedSize(68, 68);//è®¾ç½®å›ºå®šå¤§å°
 	QPixmap pix(":/Resources/MainWindow/head_mask.png");
 	headlabel->setPixmap(getRoundImage(QPixmap(":/Resources/MainWindow/girl.png"), pix, headlabel->size()));
-	headlabel->move(width() / 2 - 34, ui.titleWidget->height() - 34);//ÒÆ¶¯µ½ÖĞ¼ä
+	headlabel->move(width() / 2 - 34, ui.titleWidget->height() - 34);//ç§»åŠ¨åˆ°ä¸­é—´
 	
-	connect(ui.loginBtn, &QPushButton::clicked, this, &UserLogin::onLoginBtnClicked);//µã»÷µÇÂ½,ÑéÖ¤Êı¾İ¿âÕËºÅÃÜÂë
+	connect(ui.loginBtn, &QPushButton::clicked, this, &UserLogin::onLoginBtnClicked);//ç‚¹å‡»ç™»é™†,éªŒè¯æ•°æ®åº“è´¦å·å¯†ç 
 
-	//Á¬½ÓÊı¾İ¿âÊ§°Ü
+	//è¿æ¥æ•°æ®åº“å¤±è´¥
 	if (!connectMySql()) {
-		QMessageBox::information(NULL, QString::fromLocal8Bit("ÌáÊ¾"),QString::fromLocal8Bit("Á¬½ÓÊ§°Ü!") );
+		QMessageBox::information(NULL, QString::fromLocal8Bit("æç¤º"),QString::fromLocal8Bit("è¿æ¥å¤±è´¥!") );
 		close();
 	}
 }
 
-bool UserLogin::connectMySql()//Á¬½ÓÊı¾İ¿â
+bool UserLogin::connectMySql()//è¿æ¥æ•°æ®åº“
 {
-	QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");//myysqlÊı¾İ¿â
-	db.setHostName("127.0.0.1");//ÉèÖÃÖ÷»úÃû
-	//db.setHostName("localhost");//ÉèÖÃÖ÷»úÃû
-	db.setPort(3306);//ÉèÖÃ¶Ë¿Ú
-	db.setUserName("root");//ÉèÖÃµÇÂ¼Ãû
-	db.setPassword("zhou1zhou2");//ÉèÖÃÃÜÂë
-	db.setDatabaseName("qtqq");//ÉèÖÃÊı¾İ¿âÃû
+	QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");//myysqlæ•°æ®åº“
+	db.setHostName("127.0.0.1");//è®¾ç½®ä¸»æœºå
+	//db.setHostName("localhost");//è®¾ç½®ä¸»æœºå
+	db.setPort(3306);//è®¾ç½®ç«¯å£
+	db.setUserName("root");//è®¾ç½®ç™»å½•å
+	db.setPassword("123456789");//è®¾ç½®å¯†ç 
+	db.setDatabaseName("qtqq");//è®¾ç½®æ•°æ®åº“å
 
-	//QSqlError e = db.lastError();//´ò¿ªÊı¾İ¿â³öÏÖµÄ×îºóÒ»¸öÎÊÌâ
-	//QMessageBox::information(NULL, QString::fromLocal8Bit("´ò²»¿ªMySQLÎÊÌâ:"), e.databaseText()+"--"+e.driverText());
+	//QSqlError e = db.lastError();//æ‰“å¼€æ•°æ®åº“å‡ºç°çš„æœ€åä¸€ä¸ªé—®é¢˜
+	//QMessageBox::information(NULL, QString::fromLocal8Bit("æ‰“ä¸å¼€MySQLé—®é¢˜:"), e.databaseText()+"--"+e.driverText());
 
 	if (db.open()) {
-		//QMessageBox::information(NULL, QString::fromLocal8Bit("ÌáÊ¾"), QString::fromLocal8Bit("Á¬½Ó³É¹¦!"));
-		return true;//Êı¾İ´ò¿ª³É¹¦
+		//QMessageBox::information(NULL, QString::fromLocal8Bit("æç¤º"), QString::fromLocal8Bit("è¿æ¥æˆåŠŸ!"));
+		return true;//æ•°æ®æ‰“å¼€æˆåŠŸ
 	}else{
-		return false;//Êı¾İ¿â´ò¿ªÊ§°Ü
+		return false;//æ•°æ®åº“æ‰“å¼€å¤±è´¥
 	}
 }
 
-bool UserLogin::veryfyAccountCode()//ÑéÖ¤ÕË»§&ÃÜÂë
-{//ĞèÓÅ»¯
+bool UserLogin::veryfyAccountCode()//éªŒè¯è´¦æˆ·&å¯†ç 
+{//éœ€ä¼˜åŒ–
 	
-	QString strAccountInput = ui.editUserAccount->text();//ÕË»§
-	QString strCodeInput = ui.editPassword->text();//ÃÜÂë
+	QString strAccountInput = ui.editUserAccount->text();//è´¦æˆ·
+	QString strCodeInput = ui.editPassword->text();//å¯†ç 
 
-	//ÊäÈëÔ±¹¤ºÅ»òÕßQQºÅ 
+	//è¾“å…¥å‘˜å·¥å·æˆ–è€…QQå· 
 	QString strSqlCode = QString("select code from tab_accounts where employeeID = %1;").arg(strAccountInput);
-	QSqlQuery queryEmployeeID(strSqlCode);//²éÑ¯
-	queryEmployeeID.exec();//Ö´ĞĞ
+	QSqlQuery queryEmployeeID(strSqlCode);//æŸ¥è¯¢
+	queryEmployeeID.exec();//æ‰§è¡Œ
 
-	if (queryEmployeeID.first()) {//Ö¸Ïò½á¹û¼¯µÚÒ»Ìõ
-		QString strCode = queryEmployeeID.value(0).toString();//Êı¾İ¿âÖĞQQºÅÊı¾İ¶ÔÓ¦µÄÃÜÂë
-		if (strCode == strCodeInput) {//ÅĞ¶ÏÃÜÂëºÍÊı¾İ¿âµÄÃÜÂëÊÇ·ñÒ»ÖÂ
+	if (queryEmployeeID.first()) {//æŒ‡å‘ç»“æœé›†ç¬¬ä¸€æ¡
+		QString strCode = queryEmployeeID.value(0).toString();//æ•°æ®åº“ä¸­QQå·æ•°æ®å¯¹åº”çš„å¯†ç 
+		if (strCode == strCodeInput) {//åˆ¤æ–­å¯†ç å’Œæ•°æ®åº“çš„å¯†ç æ˜¯å¦ä¸€è‡´
 			return true;
 		}
 		else {
@@ -75,7 +75,7 @@ bool UserLogin::veryfyAccountCode()//ÑéÖ¤ÕË»§&ÃÜÂë
 		}
 	}
 
-	//ÕËºÅµÇÂ¼
+	//è´¦å·ç™»å½•
 	strSqlCode = QString("select code,employeeID from tab_accounts where account  = '%1';").arg(strAccountInput);
 	QSqlQuery queryAccount(strSqlCode);
 	queryAccount.exec();
@@ -93,7 +93,7 @@ bool UserLogin::veryfyAccountCode()//ÑéÖ¤ÕË»§&ÃÜÂë
 
 void UserLogin::onLoginBtnClicked() {
 	if (!veryfyAccountCode()) {
-		QMessageBox::warning(NULL, QString::fromLocal8Bit("ÌáÊ¾"), QString::fromLocal8Bit("ÄúÊäÈëµÄÕËºÅ»òÃÜÂëÇëÖØĞÂÊäÈë!"));
+		QMessageBox::warning(NULL, QString::fromLocal8Bit("æç¤º"), QString::fromLocal8Bit("æ‚¨è¾“å…¥çš„è´¦å·æˆ–å¯†ç è¯·é‡æ–°è¾“å…¥!"));
 		//ui.editUserAccount->setText("");
 		//ui.editPassword->setText("");
 		return;
