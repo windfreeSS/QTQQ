@@ -40,14 +40,14 @@ bool UserLogin::connectMySql()//连接数据库
 	//db.setHostName("localhost");//设置主机名
 	db.setPort(3306);//设置端口
 	db.setUserName("root");//设置登录名
-	db.setPassword("zwc12345678910@");//设置密码
+	db.setPassword("zhou1zhou2");//设置密码
 	db.setDatabaseName("qtqq");//设置数据库名
 
 	//QSqlError e = db.lastError();//打开数据库出现的最后一个问题
 	//QMessageBox::information(NULL, QString::fromLocal8Bit("打不开MySQL问题:"), e.databaseText()+"--"+e.driverText());
 
 	if (db.open()) {
-		QMessageBox::information(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("连接成功!"));
+		//QMessageBox::information(NULL, QString::fromLocal8Bit("提示"), QString::fromLocal8Bit("连接成功!"));
 		return true;//数据打开成功
 	}else{
 		return false;//数据库打开失败
