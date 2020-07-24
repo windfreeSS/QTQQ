@@ -11,11 +11,11 @@ TalkWindowItem::~TalkWindowItem()
 {
 }
 
-void TalkWindowItem::setHeadPixmap(const QString& pixmap)
+void TalkWindowItem::setHeadPixmap(const QPixmap& pixmap)
 {
 	QPixmap mask = QPixmap(":/Resources/MainWindow/head_mask.png");
 
-	const QPixmap& headpixmap = CommonUtils::getRoundImage(QPixmap(pixmap), mask, ui.haedlabel->size());
+	const QPixmap& headpixmap = CommonUtils::getRoundImage(pixmap, mask, ui.haedlabel->size());
 	ui.haedlabel->setPixmap(headpixmap);
 }
 

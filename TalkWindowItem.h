@@ -15,7 +15,7 @@ public:
 	~TalkWindowItem();
 
 	//设置头像
-	void setHeadPixmap(const QString &pixmap);
+	void setHeadPixmap(const QPixmap& pixmap);
 	//设置标签内容
 	void setMsgLabelContent(const QString& msg);
 	//获取跟谁聊天

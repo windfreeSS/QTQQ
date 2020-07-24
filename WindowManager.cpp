@@ -39,7 +39,7 @@ WindowManager* WindowManager::getInstance()
 	return theInstance();
 }
 
-void WindowManager::addNewTalkWindow(const QString& uid, enum class GroupType groupType, const QString& strPeople)
+void WindowManager::addNewTalkWindow(const QString& uid/*, enum class GroupType groupType, const QString& strPeople*/)
 {
 	if (m_talkwindowshell==nullptr) {//判断窗口主体是否为空
 		m_talkwindowshell = new TalkWindowShell;
@@ -50,39 +50,65 @@ void WindowManager::addNewTalkWindow(const QString& uid, enum class GroupType gr
 	//通过CCMainWWindow的ui.treeWidget传来key去窗口管理中查找是否有此key的窗口,有就返回,没有就nullptr
 	QWidget* widget = findWindowName(uid);
 	if (widget == nullptr) {//窗体管理中没有TalkWindow,TalkWindowItem
-		TalkWindow* talkwindow = new TalkWindow(m_talkwindowshell,uid, groupType);//联系窗口
+		TalkWindow* talkwindow = new TalkWindow(m_talkwindowshell,uid/*, groupType*/);//联系窗口
 		TalkWindowItem* talkwindowItem = new TalkWindowItem(talkwindow);//联系窗口项目
 
-		//以窗口类型设置TalkWindow,TalkWindowItem数据(界面)
-		switch (groupType)
-		{
-		case GroupType::COMPANY:
-			//窗体主体ui.rightStackedWidget的标题位置0,0开始
-			talkwindow->setWindowName(QStringLiteral("编程世界-越写越秃头"));
-			//窗体主体ui.listWidget的项目TalkWindowItem,从0,0开始
-			talkwindowItem->setMsgLabelContent(QStringLiteral("公司群"));
-			break;
-		case GroupType::PERSONELGROUP:
-			talkwindow->setWindowName(QStringLiteral("公心,民心,爱心,事事在心"));
-			talkwindowItem->setMsgLabelContent(QStringLiteral("人事部"));
-			break;
-		case GroupType::DEVELOPMENTGROUP:
-			talkwindow->setWindowName(QStringLiteral("只有两种编程语言:一种是天天挨骂的,另一种是没人用的."));
-			talkwindowItem->setMsgLabelContent(QStringLiteral("研发部"));
-			break;
-		case GroupType::MARKETGROUP:
-			talkwindow->setWindowName(QStringLiteral("今天工作不努力,明天努力找工作"));
-			talkwindowItem->setMsgLabelContent(QStringLiteral("市场部"));
-			break;
-		case GroupType::PTOP:
-			talkwindow->setWindowName(QStringLiteral("看,有飞机"));
-			talkwindowItem->setMsgLabelContent(strPeople);
-			break;
-		default:
-			break;
-		}
+		//判断是群聊还是单聊
+		QSqlQueryModel sqlDepModel;
+		QString strSql = QString("select department_name,sign from qtqq.tab_department where departmentID = %1").arg(uid);
+		sqlDepModel.setQuery(strSql);
+		int row = sqlDepModel.rowCount();
 
-		m_talkwindowshell->addTalkWindow(talkwindow, talkwindowItem, groupType);//聊天窗体主体将新的聊天窗口添加进去
+		QString strWindowName, strMsgLabel;
+
+		if (row == 0) {//单聊  
+			QString sql = QString("select employee_name,employee_sign from qtqq.tab_employees where employeeID = %1").arg(uid);
+			sqlDepModel.setQuery(sql);
+		}
+	
+		QModelIndex indexDepIndex, signIndex;
+		indexDepIndex = sqlDepModel.index(0, 0); // 0行0列
+		signIndex = sqlDepModel.index(0, 1);
+
+		strWindowName = sqlDepModel.data(signIndex).toString();//窗口名称
+		strMsgLabel = sqlDepModel.data(indexDepIndex).toString();//个签
+
+		talkwindow->setWindowName(strWindowName);//窗口名称
+		talkwindowItem->setMsgLabelContent(strMsgLabel);//左侧联系人文本显示
+
+		m_talkwindowshell->addTalkWindow(talkwindow, talkwindowItem,uid);
+
+
+		//以窗口类型设置TalkWindow,TalkWindowItem数据(界面)
+		//switch (groupType)
+		//{
+		//case GroupType::COMPANY:
+		//	//窗体主体ui.rightStackedWidget的标题位置0,0开始
+		//	talkwindow->setWindowName(QStringLiteral("编程世界-越写越秃头"));
+		//	//窗体主体ui.listWidget的项目TalkWindowItem,从0,0开始
+		//	talkwindowItem->setMsgLabelContent(QStringLiteral("公司群"));
+		//	break;
+		//case GroupType::PERSONELGROUP:
+		//	talkwindow->setWindowName(QStringLiteral("公心,民心,爱心,事事在心"));
+		//	talkwindowItem->setMsgLabelContent(QStringLiteral("人事部"));
+		//	break;
+		//case GroupType::DEVELOPMENTGROUP:
+		//	talkwindow->setWindowName(QStringLiteral("只有两种编程语言:一种是天天挨骂的,另一种是没人用的."));
+		//	talkwindowItem->setMsgLabelContent(QStringLiteral("研发部"));
+		//	break;
+		//case GroupType::MARKETGROUP:
+		//	talkwindow->setWindowName(QStringLiteral("今天工作不努力,明天努力找工作"));
+		//	talkwindowItem->setMsgLabelContent(QStringLiteral("市场部"));
+		//	break;
+		//case GroupType::PTOP:
+		//	talkwindow->setWindowName(QStringLiteral("看,有飞机"));
+		//	talkwindowItem->setMsgLabelContent(strPeople);
+		//	break;
+		//default:
+		//	break;
+		//}
+
+		//m_talkwindowshell->addTalkWindow(talkwindow, talkwindowItem, groupType);//聊天窗体主体将新的聊天窗口添加进去
 	}
 	else {
 		//左侧聊天列表设为选择

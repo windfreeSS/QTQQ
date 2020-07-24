@@ -17,26 +17,11 @@
 #include "TalkWindowShell.h"
 #include <QMouseEvent>
 #include <qapplication.h>
+#include <QSqlQuery>
 
 class QTreeWidgetItem;
 
-/*
-//自定义的风格
-class CustomProxyStyle : public QProxyStyle {
-public:
-	//PrimitiveElement枚举描述了各种原始元素。基本元素是一种常见的GUI元素，如复选框指示符或按钮斜角。
-	virtual void drawPrimitive(PrimitiveElement element, const QStyleOption* optin
-		, QPainter* painter, const QWidget* widget= nullptr)const {
-		if (element == PE_FrameFocusRect) {//通用的重点指标
-			//不需要绘制默认的带焦点的边框
-			return;
-		}
-		else {
-			QProxyStyle::drawPrimitive(element, optin, painter,widget);
-		}
-
-	}
-};*/
+extern QString gLoginEmployeeID;//登录者QQ号(员工号)
 
 //QQ入口主窗口
 class CCMainWindow : public BasicWindow
@@ -44,7 +29,7 @@ class CCMainWindow : public BasicWindow
 	Q_OBJECT
 
 public:
-	CCMainWindow(BasicWindow*parent = Q_NULLPTR);
+	CCMainWindow(QString account,bool isAccountLogin,BasicWindow* parent = Q_NULLPTR);
 	~CCMainWindow();
 
 	void setUserName(const QString& username);//初始化用户名
@@ -59,7 +44,9 @@ private:
 	void initControl();//初始化控件
 	void initTimer();//初始化计时器(模拟QQ等级升级)
 	void updateSeachStyle();//更新搜索样式
-	void addCompanyDeps(QTreeWidgetItem* pRootGroupItem, const QString& sDeps);//添加公司分组
+	void addCompanyDeps(QTreeWidgetItem* pRootGroupItem, int DepID);//添加公司分组
+
+	QString getHeadPicturePath();//获取登录者头像路径
 private:
 	void resizeEvent(QResizeEvent* event);//调整大小时间
 	bool eventFilter(QObject* obj, QEvent* event);//事件过滤
@@ -76,5 +63,8 @@ private slots:
 private:
 	Ui::CCMainWindow ui;
 	skinWindow* SkinWindow = nullptr;
-	QMap<QTreeWidgetItem*,QString> m_groupMap;//所有分组的分组项
+	//QMap<QTreeWidgetItem*,QString> m_groupMap;//所有分组的分组项
+
+	bool m_isAccountLogin;
+	QString m_account;//账号或QQ号
 };

@@ -361,5 +361,27 @@
         <file>Resources/MainWindow/MsgHtml/msgtmpl.js</file>
         <file>Resources/MainWindow/MsgHtml/qwebchannel.js</file>
         <file>Resources/MainWindow/MsgHtml/ui.css</file>
+        <file>Resources/imagesss/A.jpg</file>
+        <file>Resources/imagesss/B.jpg</file>
+        <file>Resources/imagesss/C.jpg</file>
+        <file>Resources/imagesss/D.jpg</file>
+        <file>Resources/imagesss/E.jpeg</file>
+        <file>Resources/imagesss/F.jpg</file>
+        <file>Resources/imagesss/G.jpg</file>
+        <file>Resources/imagesss/H.jpg</file>
+        <file>Resources/imagesss/I.jpg</file>
+        <file>Resources/imagesss/J.jpg</file>
+        <file>Resources/imagesss/K.jpeg</file>
+        <file>Resources/imagesss/L.jpg</file>
+        <file>Resources/imagesss/M.jpg</file>
+        <file>Resources/imagesss/N.jpg</file>
+        <file>Resources/imagesss/O.jpg</file>
+        <file>Resources/imagesss/P.jpg</file>
+        <file>Resources/imagesss/Q.jpg</file>
+        <file>Resources/imagesss/R.jpg</file>
+        <file>Resources/imagesss/S.jpg</file>
+        <file>Resources/imagesss/T.jpeg</file>
+        <file>Resources/imagesss/U.jpg</file>
+        <file>Resources/imagesss/Y.jpg</file>
     </qresource>
 </RCC>

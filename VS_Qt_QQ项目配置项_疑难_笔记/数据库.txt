@@ -22,12 +22,12 @@ create  table tab_employees (departmentID int UNSIGNED  not null comment'员工�
 		online tinyint not null comment'在线状态,不为空,1离线,2在线');	#创建员工表
 
 //插入数据 部门表数据
-			  insert into tab_department values(2000,'公司群','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\A.jpg','悦分享越拥有');
-insert into tab_department(department_name ,picture ,sign ) values('人事部','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\B.jpg','公心,民心,爱心,事事在心');
-insert into tab_department(department_name ,picture ,sign ) values('研发部','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\C.jpg','世界只有两种语言:一种没人用,一种天天挨骂.');
-insert into tab_department(department_name ,picture ,sign ) values('市场部','D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\D.jpg','今天工作不努力,明天努力找工作!');
+			  insert into tab_department values(2000,'公司群',':/Resources/imagesss/A.jpg','悦分享越拥有');
+insert into tab_department(department_name ,picture ,sign ) values('人事部',':/Resources/imagesss/B.jpg','公心,民心,爱心,事事在心');
+insert into tab_department(department_name ,picture ,sign ) values('研发部',':/Resources/imagesss/C.jpg','世界只有两种语言:一种没人用,一种天天挨骂.');
+insert into tab_department(department_name ,picture ,sign ) values('市场部',':/Resources/imagesss/D.jpg','今天工作不努力,明天努力找工作!');     #路径使用这个才可以,因为'\' 需转义
 
-
+#插入员工数据
 						insert into tab_employees values(2001,10001,'renyi','风一样的女子',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\E.jpg',1);
 insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2001,'rener','奋斗中....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\F.jpg',1);
 insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2001,'rensan','加油....',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\G.jpg',1);
@@ -38,6 +38,7 @@ insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,pic
 insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2003,'shier','目标明确,坚定不移',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\L.jpg',1);
 insert into tab_employees(departmentID,employee_name ,employee_sign ,status ,picture ,online ) values(2003,'shisan','周末看海去.',1,'D:\C++_source_code_Qt_VS\IT_QT\VS_QT_QQ\QTQQ\Resources\imagesss\M.jpg',1);
 
+//插入账户,密码数据
 insert into tab_accounts values(10001,'renyi','renyi');
 insert into tab_accounts values(10002,'rener','rener');
 insert into tab_accounts values(10003,'rensan','rensan');

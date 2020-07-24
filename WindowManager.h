@@ -4,6 +4,7 @@
 #include "TalkWindow.h"
 #include "TalkWindowItem.h"
 #include "TalkWindowShell.h"
+#include <QSqlQueryModel>
 
 class TalkWindowShell;
 enum class GroupType;
@@ -21,7 +22,7 @@ public:
 	void addWindowName(const QString& qsWindowName,QWidget* qWidget);//添加窗口
 
 	static WindowManager* getInstance();//获取实例
-	void addNewTalkWindow(const QString& uid,enum class GroupType groupType, const QString& strPeople = "");//添加新聊天窗口
+	void addNewTalkWindow(const QString& uid/*,enum class GroupType groupType, const QString& strPeople = ""*/);//添加新聊天窗口
 
 private:
 	TalkWindowShell* m_talkwindowshell;

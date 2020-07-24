@@ -1,11 +1,13 @@
 #include "TalkWindow.h"
 
-TalkWindow::TalkWindow(QWidget* parent, const QString& uid, enum class GroupType groupType)
-	: QWidget(parent),m_talkId(uid),m_groupType(groupType)
+TalkWindow::TalkWindow(QWidget* parent, const QString& uid/*, enum class GroupType groupType*/)
+	: QWidget(parent),m_talkId(uid)
+	//,m_groupType(groupType)
 {
 	ui.setupUi(this);
 	WindowManager::getInstance()->addWindowName(m_talkId,this);//Íù´°Ìå¹ÜÀíÊµÀıÌí¼ÓÓ³Éä
-	setAttribute(Qt::WA_DeleteOnClose);
+	setAttribute(Qt::WA_DeleteOnClose);//ÉèÖÃ´°ÌåÊôĞÔ
+	initGroupTalkStatus();
 	initControl();
 }
 
@@ -64,7 +66,7 @@ void TalkWindow::onItemDoubleClicked(QTreeWidgetItem* item, int column) {//¶ÔË«»
 	//ÊÇ·ñÊÇ×ÓÏî
 	if (item->data(0, Qt::UserRole).toBool()) {//×ÓÏî
 		QString strPeopleName = m_groupPeopleMap.value(item);//»ñÈ¡ÈËÃû
-		WindowManager::getInstance()->addNewTalkWindow(item->data(0, Qt::UserRole+1).toString(), GroupType::PTOP, strPeopleName);
+		WindowManager::getInstance()->addNewTalkWindow(item->data(0, Qt::UserRole+1).toString()/*, GroupType::PTOP, strPeopleName*/);
 	}
 }
 
@@ -85,7 +87,14 @@ void TalkWindow::initControl()
 
 	connect(ui.treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(onItemDoubleClicked(QTreeWidgetItem*, int)));
 
-	switch (m_groupType)
+	if (m_isGroupTalk) {
+		initTalkWindow();//³õÊ¼»¯ÈºÁÄ
+	}
+	else {
+		initPtoPTalk();//³õÊ¼»¯µ¥ÁÄ
+	}
+
+	/*switch (m_groupType)
 	{
 	case GroupType::COMPANY:
 		initCompanyTalk();
@@ -104,116 +113,186 @@ void TalkWindow::initControl()
 		break;
 	default:
 		break;
+	}*/
+}
+
+void TalkWindow::initGroupTalkStatus()
+{
+	QSqlQueryModel sqlDepModel;
+	QString strSql = QString("select * from qtqq.tab_department where departmentID = %1").arg(m_talkId);
+	sqlDepModel.setQuery(strSql);
+	int row = sqlDepModel.rowCount();
+	if (row == 0) {//µ¥ÁÄ
+		m_isGroupTalk = false;
+	}
+	else {//ÈºÁÄ
+		m_isGroupTalk = true;
 	}
 }
 
-void TalkWindow::initCompanyTalk()
+void TalkWindow::initTalkWindow()
 {
-	QTreeWidgetItem* pRootItem = new QTreeWidgetItem;//¸ùÏî
-	pRootItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
+	QTreeWidgetItem* prootitem = new QTreeWidgetItem;//¸ùÏî
+	prootitem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
 
-	pRootItem->setData(0, Qt::UserRole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
-	RootContactItem* pItemName = new RootContactItem(false,ui.treeWidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
-
-	ui.treeWidget->setFixedHeight(646);//shell¸ß¶È-shellÍ·¸ß(TalkWindow::ui.titleWidget)
+	prootitem->setData(0, Qt::UserRole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
+	RootContactItem* pitemname = new RootContactItem(false, ui.treeWidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
 	
-	int nEmployeeNum = 50;//ÈºÔ±×ÜÊı
-	QString qsGroupName = QString::fromLocal8Bit("¹«Ë¾Èº %1/%2").arg(0).arg(nEmployeeNum);//ÔÚÏß/×ÜÈËÊı
-	pItemName->setText(qsGroupName);
-	 
+	ui.treeWidget->setFixedHeight(646);//shell¸ß¶È-shellÍ·¸ß(talkwindow::ui.titlewidget)
+
+	//µ±Ç°ÁÄÌìµÄÈº×éÃû»òÈËÃû³Æ
+	QString strGroupName;
+	QSqlQuery queryGroupName(QString("select department_name from qtqq.tab_department where departmentID = %1").arg(m_talkId));
+	queryGroupName.exec();
+	if (queryGroupName.next()) {
+		strGroupName= queryGroupName.value(0).toString();
+	}
+
+	//¹«Ë¾Èº»ò²¿ÃÅÈº
+	QSqlQueryModel queryEmployeeModel;
+	if (getCompDepID() == m_talkId.toInt()) {//¹«Ë¾Èº
+		queryEmployeeModel.setQuery("select employeeID from qtqq.tab_employees where status = 1");
+	}
+	else {
+		queryEmployeeModel.setQuery(QString("select employeeID from qtqq.tab_employees where status = 1 and departmentID = %1").arg(m_talkId.toInt()));
+	}
+
+	int nemployeenum = queryEmployeeModel.rowCount();//Èº×éÈºÔ±×ÜÊı
+
+	//Èº×éÁªÏµÏîµÄÎÄ±¾
+	QString qsGroupName = QString("%1 %2/%3").arg(strGroupName).arg(0).arg(nemployeenum);//ÔÚÏß/×ÜÈËÊı
+	pitemname->setText(qsGroupName);
+
 	//²åÈë·Ö×é½Úµã
-	ui.treeWidget->addTopLevelItem(pRootItem);
-	ui.treeWidget->setItemWidget(pRootItem,0,pItemName);
+	ui.treeWidget->addTopLevelItem(prootitem);
+	ui.treeWidget->setItemWidget(prootitem, 0, pitemname);
 
 	//Õ¹¿ª
-	pRootItem->setExpanded(true);
+	prootitem->setExpanded(true);
 
 	//Ìí¼Ó×ÓÏî
-	for (int i = 0; i < nEmployeeNum; i++) {
-		addPeopInfo(pRootItem);
+	for (int i = 0; i < nemployeenum; i++) {
+		QModelIndex modelIndex = queryEmployeeModel.index(i, 0);
+		int employeeID = queryEmployeeModel.data(modelIndex).toInt();//Ô±¹¤QQºÅ
+		addPeopInfo(prootitem,employeeID);
 	}
 }
 
-void TalkWindow::initPersonelTalk()
+int TalkWindow::getCompDepID()
 {
-	QTreeWidgetItem* pRootItem = new QTreeWidgetItem;//¸ùÏî
-	pRootItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
-
-	pRootItem->setData(0, Qt::UserRole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
-	RootContactItem* pItemName = new RootContactItem(false, ui.treeWidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
-
-	ui.treeWidget->setFixedHeight(646);//shell¸ß¶È-shellÍ·¸ß(TalkWindow::ui.titleWidget)
-
-	int nEmployeeNum = 5;//ÈºÔ±×ÜÊı
-	QString qsGroupName = QString::fromLocal8Bit("ÈËÊÂ²¿ %1/%2").arg(0).arg(nEmployeeNum);//ÔÚÏß/×ÜÈËÊı
-	pItemName->setText(qsGroupName);
-
-	//²åÈë·Ö×é½Úµã
-	ui.treeWidget->addTopLevelItem(pRootItem);
-	ui.treeWidget->setItemWidget(pRootItem, 0, pItemName);
-
-	//Õ¹¿ª
-	pRootItem->setExpanded(true);
-
-	//Ìí¼Ó×ÓÏî
-	for (int i = 0; i < nEmployeeNum; i++) {
-		addPeopInfo(pRootItem);
-	}
+	QSqlQuery queryDepID(QString("select departmentID from qtqq.tab_department where department_name = '%1'").arg(QString::fromLocal8Bit("¹«Ë¾Èº")));
+	queryDepID.exec();
+	queryDepID.next();
+	return queryDepID.value(0).toInt();
 }
 
-void TalkWindow::initMarketTalk()
-{
-	QTreeWidgetItem* pRootItem = new QTreeWidgetItem;//¸ùÏî
-	pRootItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
-
-	pRootItem->setData(0, Qt::UserRole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
-	RootContactItem* pItemName = new RootContactItem(false, ui.treeWidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
-
-	ui.treeWidget->setFixedHeight(646);//shell¸ß¶È-shellÍ·¸ß(TalkWindow::ui.titleWidget)
-
-	int nEmployeeNum = 8;//ÈºÔ±×ÜÊı
-	QString qsGroupName = QString::fromLocal8Bit("ÊĞ³¡²¿ %1/%2").arg(0).arg(nEmployeeNum);//ÔÚÏß/×ÜÈËÊı
-	pItemName->setText(qsGroupName);
-
-	//²åÈë·Ö×é½Úµã
-	ui.treeWidget->addTopLevelItem(pRootItem);
-	ui.treeWidget->setItemWidget(pRootItem, 0, pItemName);
-
-	//Õ¹¿ª
-	pRootItem->setExpanded(true);
-
-	//Ìí¼Ó×ÓÏî
-	for (int i = 0; i < nEmployeeNum; i++) {
-		addPeopInfo(pRootItem);
-	}
-}
-
-void TalkWindow::initDevelopTalk()
-{
-	QTreeWidgetItem* pRootItem = new QTreeWidgetItem;//¸ùÏî
-	pRootItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
-
-	pRootItem->setData(0, Qt::UserRole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
-	RootContactItem* pItemName = new RootContactItem(false, ui.treeWidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
-
-	ui.treeWidget->setFixedHeight(646);//shell¸ß¶È-shellÍ·¸ß(TalkWindow::ui.titleWidget)
-
-	int nEmployeeNum = 32;//ÈºÔ±×ÜÊı
-	QString qsGroupName = QString::fromLocal8Bit("ÑĞ·¢²¿ %1/%2").arg(0).arg(nEmployeeNum);//ÔÚÏß/×ÜÈËÊı
-	pItemName->setText(qsGroupName);
-
-	//²åÈë·Ö×é½Úµã
-	ui.treeWidget->addTopLevelItem(pRootItem);
-	ui.treeWidget->setItemWidget(pRootItem, 0, pItemName);
-
-	//Õ¹¿ª
-	pRootItem->setExpanded(true);
-
-	//Ìí¼Ó×ÓÏî
-	for (int i = 0; i < nEmployeeNum; i++) {
-		addPeopInfo(pRootItem);
-	}
-}
+//void talkwindow::initcompanytalk()
+//{
+//	qtreewidgetitem* prootitem = new qtreewidgetitem;//¸ùÏî
+//	prootitem->setchildindicatorpolicy(qtreewidgetitem::showindicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
+//
+//	prootitem->setdata(0, qt::userrole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
+//	rootcontactitem* pitemname = new rootcontactitem(false,ui.treewidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
+//
+//	ui.treewidget->setfixedheight(646);//shell¸ß¶È-shellÍ·¸ß(talkwindow::ui.titlewidget)
+//	
+//	int nemployeenum = 50;//ÈºÔ±×ÜÊı
+//	qstring qsgroupname = qstring::fromlocal8bit("¹«Ë¾Èº %1/%2").arg(0).arg(nemployeenum);//ÔÚÏß/×ÜÈËÊı
+//	pitemname->settext(qsgroupname);
+//	 
+//	//²åÈë·Ö×é½Úµã
+//	ui.treewidget->addtoplevelitem(prootitem);
+//	ui.treewidget->setitemwidget(prootitem,0,pitemname);
+//
+//	//Õ¹¿ª
+//	prootitem->setexpanded(true);
+//
+//	//Ìí¼Ó×ÓÏî
+//	for (int i = 0; i < nemployeenum; i++) {
+//		addpeopinfo(prootitem);
+//	}
+//}
+//
+//void talkwindow::initpersoneltalk()
+//{
+//	qtreewidgetitem* prootitem = new qtreewidgetitem;//¸ùÏî
+//	prootitem->setchildindicatorpolicy(qtreewidgetitem::showindicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
+//
+//	prootitem->setdata(0, qt::userrole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
+//	rootcontactitem* pitemname = new rootcontactitem(false, ui.treewidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
+//
+//	ui.treewidget->setfixedheight(646);//shell¸ß¶È-shellÍ·¸ß(talkwindow::ui.titlewidget)
+//
+//	int nemployeenum = 5;//ÈºÔ±×ÜÊı
+//	qstring qsgroupname = qstring::fromlocal8bit("ÈËÊÂ²¿ %1/%2").arg(0).arg(nemployeenum);//ÔÚÏß/×ÜÈËÊı
+//	pitemname->settext(qsgroupname);
+//
+//	//²åÈë·Ö×é½Úµã
+//	ui.treewidget->addtoplevelitem(prootitem);
+//	ui.treewidget->setitemwidget(prootitem, 0, pitemname);
+//
+//	//Õ¹¿ª
+//	prootitem->setexpanded(true);
+//
+//	//Ìí¼Ó×ÓÏî
+//	for (int i = 0; i < nemployeenum; i++) {
+//		addpeopinfo(prootitem);
+//	}
+//}
+//
+//void talkwindow::initmarkettalk()
+//{
+//	qtreewidgetitem* prootitem = new qtreewidgetitem;//¸ùÏî
+//	prootitem->setchildindicatorpolicy(qtreewidgetitem::showindicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
+//
+//	prootitem->setdata(0, qt::userrole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
+//	rootcontactitem* pitemname = new rootcontactitem(false, ui.treewidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
+//
+//	ui.treewidget->setfixedheight(646);//shell¸ß¶È-shellÍ·¸ß(talkwindow::ui.titlewidget)
+//
+//	int nemployeenum = 8;//ÈºÔ±×ÜÊı
+//	qstring qsgroupname = qstring::fromlocal8bit("ÊĞ³¡²¿ %1/%2").arg(0).arg(nemployeenum);//ÔÚÏß/×ÜÈËÊı
+//	pitemname->settext(qsgroupname);
+//
+//	//²åÈë·Ö×é½Úµã
+//	ui.treewidget->addtoplevelitem(prootitem);
+//	ui.treewidget->setitemwidget(prootitem, 0, pitemname);
+//
+//	//Õ¹¿ª
+//	prootitem->setexpanded(true);
+//
+//	//Ìí¼Ó×ÓÏî
+//	for (int i = 0; i < nemployeenum; i++) {
+//		addpeopinfo(prootitem);
+//	}
+//}
+//
+//void talkwindow::initdeveloptalk()
+//{
+//	qtreewidgetitem* prootitem = new qtreewidgetitem;//¸ùÏî
+//	prootitem->setchildindicatorpolicy(qtreewidgetitem::showindicator);//ÉèÖÃ×ÓÏîµÄ²ßÂÔ(Ã»ÓĞ×ÓÏî¶¼ÄÜÊÕËõ)
+//
+//	prootitem->setdata(0, qt::userrole, 0);//ÉèÖÃÊı¾İÒÔÊ¾Çø·Ö¸¸ºÍ×Ó
+//	rootcontactitem* pitemname = new rootcontactitem(false, ui.treewidget);//¸ùÁªÏµÏî(ÎŞ¼ıÍ·,¸¸Ïî)
+//
+//	ui.treewidget->setfixedheight(646);//shell¸ß¶È-shellÍ·¸ß(talkwindow::ui.titlewidget)
+//
+//	int nemployeenum = 32;//ÈºÔ±×ÜÊı
+//	qstring qsgroupname = qstring::fromlocal8bit("ÑĞ·¢²¿ %1/%2").arg(0).arg(nemployeenum);//ÔÚÏß/×ÜÈËÊı
+//	pitemname->settext(qsgroupname);
+//
+//	//²åÈë·Ö×é½Úµã
+//	ui.treewidget->addtoplevelitem(prootitem);
+//	ui.treewidget->setitemwidget(prootitem, 0, pitemname);
+//
+//	//Õ¹¿ª
+//	prootitem->setexpanded(true);
+//
+//	//Ìí¼Ó×ÓÏî
+//	for (int i = 0; i < nemployeenum; i++) {
+//		addpeopinfo(prootitem);
+//	}
+//}
 
 void TalkWindow::initPtoPTalk()
 {
@@ -226,24 +305,38 @@ void TalkWindow::initPtoPTalk()
 	skinLabel->setFixedSize(ui.widget->size());
 }
 
-void TalkWindow::addPeopInfo(QTreeWidgetItem* pRootGroupItem)
+void TalkWindow::addPeopInfo(QTreeWidgetItem* pRootGroupItem,int employeeID)
 {
 	QTreeWidgetItem* pChild = new QTreeWidgetItem();
 
-	QPixmap pix1;
-	pix1.load(":/Resources/MainWindow/head_mask.png");
-	const QPixmap image1(":/Resources/MainWindow/girl.png");
-
 	//Ìí¼Ó×Ó½Úµã
 	pChild->setData(0, Qt::UserRole, 1);
-	pChild->setData(0, Qt::UserRole + 1, QString::number((int)pChild));//½«´Ë×ÓÏîµØÖ·×÷Îª´Ë×ÓÏîÎ¨Ò»Éí·İÖ¤ºÅ
-	
+	pChild->setData(0, Qt::UserRole + 1, employeeID);//½«´Ë×ÓÏîµØÖ·×÷Îª´Ë×ÓÏîÎ¨Ò»Éí·İÖ¤ºÅ
+
 	ContactItem* pContactItem = new ContactItem(ui.treeWidget);//ÁªÏµÏî
 
-	static int ii = 0;
-	pContactItem->setHeadPixmap(CommonUtils::getRoundImage(image1, pix1, pContactItem->getHeadLabelSize()));
-	pContactItem->setUserName(QString::fromLocal8Bit("ÆïÅ£·ÅÑò%1").arg(ii));//ÓÃ»§Ãû
-	pContactItem->setSignName(QString::fromLocal8Bit("±ğ°®ÎÒ%1").arg(ii++));//Ç©Ãû
+	//»ñÈ¡Ãû,Ç©Ãû,Í·Ïñ
+	QString strName, strSign, strPicturePath;
+	QSqlQueryModel queryInfoModel;
+	queryInfoModel.setQuery(QString("select employee_name,employee_sign,picture from qtqq.tab_employees where employeeID = %1 ").arg(employeeID));
+
+	QModelIndex nameIndex, signIndex, pictureIndex;
+	nameIndex = queryInfoModel.index(0, 0);//ĞĞ,ÁĞ
+	signIndex = queryInfoModel.index(0, 1);
+	pictureIndex = queryInfoModel.index(0, 2);
+
+	strName = queryInfoModel.data(nameIndex).toString();
+	strSign = queryInfoModel.data(signIndex).toString();
+	strPicturePath = queryInfoModel.data(pictureIndex).toString();
+
+	QPixmap pix1;
+	pix1.load(":/Resources/MainWindow/head_mask.png");
+	QImage image1(strPicturePath);
+
+	//static int ii = 0;
+	pContactItem->setHeadPixmap(CommonUtils::getRoundImage(QPixmap::fromImage(image1), pix1, pContactItem->getHeadLabelSize())); 
+	pContactItem->setUserName(strName);//ÓÃ»§Ãû
+	pContactItem->setSignName(strSign);//Ç©Ãû
 
 	pRootGroupItem->addChild(pChild);
 	ui.treeWidget->setItemWidget(pChild, 0, pContactItem);

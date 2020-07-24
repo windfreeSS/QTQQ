@@ -19,7 +19,7 @@ TalkWindowShell::~TalkWindowShell()
 	}
 }
 
-void TalkWindowShell::addTalkWindow(TalkWindow* talkWindow, TalkWindowItem* talkWindowItem,enum class GroupType grouptype)
+void TalkWindowShell::addTalkWindow(TalkWindow* talkWindow, TalkWindowItem* talkWindowItem,const QString& uid/*,enum class GroupType grouptype*/)
 {
 	ui.rightStackedWidget->addWidget(talkWindow);
 	connect(m_emotionWindow, SIGNAL(signalEmotionWindowHide()), talkWindow, SLOT(onSetEmotionBtnStatus()));
@@ -29,8 +29,24 @@ void TalkWindowShell::addTalkWindow(TalkWindow* talkWindow, TalkWindowItem* talk
 
 	aItem->setSelected(true);//设置被选中
 
+	//判断是群聊还是单聊
+	QSqlQueryModel sqlDepModel;
+	QString strQuery = QString("select picture  from qtqq.tab_department where departmentID = %1").arg(uid);
+	sqlDepModel.setQuery(strQuery);
+	int row = sqlDepModel.rowCount();
+
+	if (row == 0) {
+		strQuery= QString("select picture  from qtqq.tab_employees where employeeID = %1").arg(uid);
+		sqlDepModel.setQuery(strQuery);
+	}
+
+	QModelIndex index;
+	index = sqlDepModel.index(0, 0);
+	QImage img;
+	img.load(sqlDepModel.data(index).toString());
+
 	//设置头像
-	talkWindowItem->setHeadPixmap(QString::fromLocal8Bit(":/Resources/MainWindow/girl.png"));
+	talkWindowItem->setHeadPixmap(QPixmap::fromImage(img));
 
 	//添加项部件
 	ui.listWidget->addItem(aItem);

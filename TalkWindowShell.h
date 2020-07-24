@@ -8,6 +8,7 @@
 #include "TalkWindow.h"
 #include "TalkWindowItem.h"
 #include "ui_TalkWindowShell.h"
+#include <QSqlQueryModel>
 //#include <QListWidgetItem>
 
 //聊天窗口类型
@@ -19,7 +20,8 @@ enum class GroupType{
 	PTOP	//同事之间单独聊天
 };
 
-class TalkWindow;
+class TalkWindow;//联系窗口
+
 //聊天窗口主体
 class TalkWindowShell : public BasicWindow
 {
@@ -30,7 +32,7 @@ public:
 	~TalkWindowShell();
 
 	//添加新的聊天窗口(聊天窗口,聊天窗口项目,聊天窗口类型)
-	void addTalkWindow(TalkWindow* talkWindow, TalkWindowItem* talkWindowItem, enum class GroupType grouptype);
+	void addTalkWindow(TalkWindow* talkWindow, TalkWindowItem* talkWindowItem, const QString& uid/*, enum class GroupType grouptype*/);
 	void setCurrenWidget(QWidget* widget);//设置当前聊天窗口
 
 	const QMap<QListWidgetItem*, QWidget*>& gettalkWindowItemMap()const;
